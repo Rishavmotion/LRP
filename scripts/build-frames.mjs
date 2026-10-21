@@ -25,12 +25,19 @@ const SOURCE_W = 2880;
 const SOURCE_H = 1620;
 const STEP = 2;
 
+// Resolution ladder. The page picks a tier from viewport width × DPR
+// (see src/lib/tier.ts). q70 measured within 0.002 SSIM of q78 on this
+// footage at 20% fewer bytes; q62 saved almost nothing more.
 const SETS = {
-  // Landscape, serves everything ≥ 768px wide.
-  desktop: { width: 1920, height: 1080, quality: 78, crop: null },
+  // Landscape tiers (kind: "landscape").
+  d1280: { width: 1280, height: 720, quality: 72, crop: null, kind: "landscape" },
+  d1920: { width: 1920, height: 1080, quality: 70, crop: null, kind: "landscape" },
+  d2560: { width: 2560, height: 1440, quality: 70, crop: null, kind: "landscape" },
   // 9:16 centre crop for phones (the Figma mobile frames are the same crop).
-  mobile: { width: 810, height: 1440, quality: 74, crop: { w: 911, h: 1620 } },
+  m810: { width: 810, height: 1440, quality: 70, crop: { w: 911, h: 1620 }, kind: "portrait" },
 };
+const POSTER_SET = "d1920";
+const POSTER_MOBILE_SET = "m810";
 
 const FORCE = process.argv.includes("--force");
 const WORKERS = Math.max(2, Math.floor(os.cpus().length / 2));
@@ -75,10 +82,10 @@ async function buildPoster() {
   const out = path.join(OUT_DIR, "poster.jpg");
   const outMobile = path.join(OUT_DIR, "poster-mobile.jpg");
   if (FORCE || !(await exists(out))) {
-    await pipeline(srcPath(0), SETS.desktop).jpeg({ quality: 80, mozjpeg: true }).toFile(out);
+    await pipeline(srcPath(0), SETS[POSTER_SET]).jpeg({ quality: 80, mozjpeg: true }).toFile(out);
   }
   if (FORCE || !(await exists(outMobile))) {
-    await pipeline(srcPath(0), SETS.mobile).jpeg({ quality: 80, mozjpeg: true }).toFile(outMobile);
+    await pipeline(srcPath(0), SETS[POSTER_MOBILE_SET]).jpeg({ quality: 80, mozjpeg: true }).toFile(outMobile);
   }
 }
 
@@ -124,7 +131,7 @@ async function main() {
     sourceCount: SOURCE_COUNT,
     sourceFps: 50,
     sets: Object.fromEntries(
-      Object.entries(SETS).map(([name, s]) => [name, { width: s.width, height: s.height }])
+      Object.entries(SETS).map(([name, s]) => [name, { width: s.width, height: s.height, kind: s.kind }])
     ),
   };
   await fs.writeFile(path.join(OUT_DIR, "manifest.json"), JSON.stringify(manifest, null, 2));

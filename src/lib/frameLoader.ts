@@ -7,13 +7,15 @@
 //   3. everything else.
 // `focus()` re-prioritises frames near the current scroll position.
 
-export type FrameSet = "desktop" | "mobile";
+import { frameUrl, type Tier } from "./tier";
+
+export type FrameSet = Tier;
 
 export interface Manifest {
   step: number;
   count: number;
   sourceCount: number;
-  sets: Record<FrameSet, { width: number; height: number }>;
+  sets: Record<FrameSet, { width: number; height: number; kind: "landscape" | "portrait" }>;
 }
 
 export async function loadManifest(): Promise<Manifest> {
@@ -21,9 +23,6 @@ export async function loadManifest(): Promise<Manifest> {
   if (!res.ok) throw new Error(`manifest: ${res.status}`);
   return res.json();
 }
-
-export const frameUrl = (set: FrameSet, index: number) =>
-  `/frames/${set}/${String(index).padStart(4, "0")}.webp`;
 
 function buildPriority(count: number, firstBand: number): number[] {
   const order: number[] = [];

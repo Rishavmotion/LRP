@@ -11,12 +11,12 @@ import {
   sceneIndexAt,
   sourceFrameAt,
 } from "@/lib/scenes";
-import { FrameStore, loadManifest, type FrameSet, type Manifest } from "@/lib/frameLoader";
+import { FrameStore, loadManifest, type Manifest } from "@/lib/frameLoader";
+import { pickTier } from "@/lib/tier";
 import { sceneOverlay } from "./overlays/sceneOverlays";
 import { ScrollArrow } from "./Icons";
 import s from "./Stage.module.css";
 
-const MOBILE_QUERY = "(max-width: 767px)";
 const MAX_DPR = 2;
 /** Frames (decimated index) that must be decoded before the loading bar hides. */
 const READY_BAND = 40;
@@ -68,13 +68,18 @@ export default function Stage() {
       window.localStorage.getItem("lrp-hud") === "1";
     if (hud) hud.dataset.on = hudOn ? "1" : "0";
 
-    const currentSet = (): FrameSet =>
-      window.matchMedia(MOBILE_QUERY).matches ? "mobile" : "desktop";
-
     const resize = () => {
-      dpr = Math.min(window.devicePixelRatio || 1, MAX_DPR);
       width = canvas.clientWidth;
       height = canvas.clientHeight;
+      dpr = Math.min(window.devicePixelRatio || 1, MAX_DPR);
+      const set = store && manifest ? manifest.sets[store.set] : null;
+      if (set) {
+        // Never render more pixels than the frame has: with cover-fit, one CSS
+        // pixel holds this many frame pixels. Upscaling past it costs fill
+        // rate on every scroll tick and adds no detail.
+        const framePxPerCss = 1 / Math.max(width / set.width, height / set.height);
+        dpr = Math.max(1, Math.min(dpr, framePxPerCss));
+      }
       canvas.width = Math.round(width * dpr);
       canvas.height = Math.round(height * dpr);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -142,7 +147,7 @@ export default function Stage() {
 
     const buildStore = () => {
       if (!manifest) return;
-      const set = currentSet();
+      const set = pickTier();
       if (store?.set === set) return;
       store?.destroy();
       store = new FrameStore(set, manifest.count, { firstBand: 60, concurrency: 6 });
@@ -191,13 +196,13 @@ export default function Stage() {
     };
     gsap.ticker.add(tick);
 
+    // Resize also fires when the window moves to a screen with a different
+    // pixel ratio, so it covers every input to the tier choice.
     const onResize = () => {
-      resize();
       buildStore();
+      resize();
     };
-    const mq = window.matchMedia(MOBILE_QUERY);
     window.addEventListener("resize", onResize);
-    mq.addEventListener("change", onResize);
 
     const onKey = (e: KeyboardEvent) => {
       if (e.key.toLowerCase() !== "h" || !hud) return;
@@ -215,6 +220,7 @@ export default function Stage() {
         if (disposed) return;
         manifest = m;
         buildStore();
+        resize();
       })
       .catch((err) => console.error("Could not load frame manifest", err));
 
@@ -223,7 +229,6 @@ export default function Stage() {
       gsap.ticker.remove(tick);
       trigger.kill();
       window.removeEventListener("resize", onResize);
-      mq.removeEventListener("change", onResize);
       window.removeEventListener("keydown", onKey);
       store?.destroy();
       delete root.dataset.hero;

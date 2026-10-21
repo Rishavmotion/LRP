@@ -50,14 +50,22 @@ node scripts/build-frames.mjs          # skips frames already built
 node scripts/build-frames.mjs --force  # rebuild everything
 ```
 
-| set     | size      | crop        | frames | total   |
-| ------- | --------- | ----------- | ------ | ------- |
-| desktop | 1920×1080 | full frame  | 426    | ~17 MB  |
-| mobile  | 810×1440  | 9:16 centre | 426    | ~7.6 MB |
+| tier  | size      | crop        | served to                                    | total   |
+| ----- | --------- | ----------- | -------------------------------------------- | ------- |
+| m810  | 810×1440  | 9:16 centre | phones (≤767px)                              | ~7.2 MB |
+| d1280 | 1280×720  | full frame  | non-retina ≤1400px (most laptops)            | ~8.2 MB |
+| d1920 | 1920×1080 | full frame  | retina ≤1599px, non-retina 1401–2199px       | ~14 MB  |
+| d2560 | 2560×1440 | full frame  | retina ≥1600px, any screen ≥2200px           | ~20 MB  |
 
-`STEP = 2` keeps every 2nd source frame; scroll scrubbing doesn't need 50fps density. The
-sizes, quality and step are constants at the top of the script. There's plenty of headroom to
-add a 2560-wide tier for large retina screens if wanted.
+Each device downloads one tier only. `src/lib/tier.ts` defines the tiers as media queries,
+used both by `<link rel="preload">` tags in the HTML head (the first 6 frames, fetched before
+JS boots) and by the loader, so the preloaded frames are reused, never fetched twice. Browsers
+with data-saver on get one tier lower. The canvas is capped at the frame's own resolution, so
+retina screens don't spend fill rate upscaling.
+
+Quality is q70 (q72 for d1280): measured within 0.002 SSIM of q78 on this footage at 20% fewer
+bytes. `STEP = 2` keeps every 2nd source frame; scroll scrubbing doesn't need 50fps density.
+All of it is constants at the top of the script.
 
 ## Fonts
 
