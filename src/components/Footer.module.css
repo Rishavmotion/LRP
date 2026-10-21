@@ -1,0 +1,245 @@
+.footer {
+  position: relative;
+  z-index: 1;
+  padding: var(--gutter-y) var(--gutter);
+  background: var(--footer);
+}
+
+.inner {
+  display: flex;
+  flex-direction: column;
+  gap: 60px;
+}
+
+.top {
+  display: flex;
+  align-items: stretch;
+  gap: 55px;
+}
+
+.brand {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.brand img {
+  width: 237px;
+  height: auto;
+}
+
+.tagline {
+  font-size: 24px;
+  letter-spacing: -0.03em;
+}
+
+.newsletter {
+  width: min(713px, 48%);
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.newsletterHeading {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.newsletterTitle {
+  font-size: 24px;
+  font-weight: 500;
+  letter-spacing: -0.03em;
+}
+
+.newsletterSub {
+  font-size: 20px;
+  letter-spacing: -0.03em;
+  opacity: 0.6;
+}
+
+.input {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 18px 20px 18px 22px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(0, 158, 226, 0.3);
+  cursor: text;
+}
+
+.input input {
+  flex: 1;
+  min-width: 0;
+  background: none;
+  border: 0;
+  outline: none;
+  color: #fff;
+  font: inherit;
+  font-size: 20px;
+  letter-spacing: -0.03em;
+}
+
+.input input::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+.rule {
+  border: 0;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.columns {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 55px;
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.columnTitle {
+  font-size: 24px;
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  opacity: 0.6;
+}
+
+.column ul {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  list-style: none;
+  font-size: 20px;
+  letter-spacing: -0.03em;
+}
+
+.column a:hover,
+.legal a:hover {
+  opacity: 0.7;
+}
+
+.legal {
+  display: flex;
+  justify-content: space-between;
+  gap: 40px;
+  font-size: 15px;
+  letter-spacing: -0.03em;
+}
+
+.legal ul {
+  display: flex;
+  gap: 10px;
+  width: 700px;
+  list-style: none;
+}
+
+.legal li {
+  flex: 1;
+}
+
+@media (max-width: 1100px) {
+  .legal ul {
+    width: auto;
+    gap: 32px;
+  }
+  .legal li {
+    flex: none;
+  }
+}
+
+@media (max-width: 767px) {
+  .footer {
+    padding: 20px;
+  }
+  .inner {
+    gap: 32px;
+  }
+  .top {
+    flex-direction: column;
+    gap: 32px;
+  }
+  .brand {
+    gap: 12px;
+    padding-bottom: 12px;
+  }
+  .brand img {
+    width: 194px;
+  }
+  .tagline {
+    font-size: 16px;
+  }
+  .newsletter {
+    width: 100%;
+    gap: 20px;
+  }
+  .newsletterHeading {
+    gap: 6px;
+  }
+  .newsletterTitle {
+    font-size: 16px;
+  }
+  .newsletterSub {
+    font-size: 14px;
+  }
+  .input {
+    padding: 14px 16px;
+    border-width: 1.5px;
+  }
+  .input input {
+    font-size: 16px;
+  }
+  .columns {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px 55px;
+  }
+  .column {
+    gap: 24px;
+    padding-bottom: 12px;
+  }
+  .columnTitle {
+    font-size: 16px;
+  }
+  .column ul {
+    gap: 8px;
+    font-size: 16px;
+  }
+  .column li {
+    display: flex;
+    align-items: center;
+    height: 36px;
+  }
+  .legal {
+    flex-direction: column;
+    gap: 22px;
+  }
+  .legal ul {
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+    font-size: 16px;
+  }
+  .legal li {
+    display: flex;
+    align-items: center;
+    height: 36px;
+  }
+  .legal p {
+    order: 2;
+    font-size: 14px;
+  }
+}

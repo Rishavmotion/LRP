@@ -1,0 +1,16 @@
+{
+  "step": 2,
+  "count": 426,
+  "sourceCount": 851,
+  "sourceFps": 50,
+  "sets": {
+    "desktop": {
+      "width": 1920,
+      "height": 1080
+    },
+    "mobile": {
+      "width": 810,
+      "height": 1440
+    }
+  }
+}

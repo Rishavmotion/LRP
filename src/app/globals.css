@@ -1,0 +1,94 @@
+:root {
+  /* Palette (from the Figma "Dark" design) */
+  --navy-900: #061624;
+  --navy-800: #0d253b;
+  --navy-700: #143351;
+  --navy-600: #21507e;
+  --navy-500: #29598b;
+  --footer: #0f305d;
+  --cta: #1f486e;
+  --blue: #009ee2;
+  --white: #ffffff;
+
+  /* Type: Locator is the design font; Inter stands in until it's licensed.
+     See src/app/layout.tsx to swap it. */
+  --font-display: var(--font-sans), "Inter", system-ui, sans-serif;
+
+  /* Responsive gutters: 160px on the 1801px design, down to 24px on phones. */
+  --gutter: clamp(20px, 8.9vw, 160px);
+  --gutter-y: clamp(20px, 15vh, 160px);
+
+  /* Type scale (desktop design → mobile design) */
+  --h1: clamp(42px, 5vw, 90px);
+  --h2: clamp(34px, 3.35vw, 60px);
+  --lead: clamp(16px, 1.45vw, 26px);
+  --body: clamp(18px, 1.33vw, 24px);
+  --eyebrow: clamp(14px, 1vw, 18px);
+  --nav: 18px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  color-scheme: dark;
+  -webkit-text-size-adjust: 100%;
+}
+
+html,
+body {
+  background: var(--navy-900);
+  color: var(--white);
+  font-family: var(--font-display);
+  font-weight: 300;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: clip;
+}
+
+body {
+  min-height: 100%;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+img,
+svg,
+canvas {
+  display: block;
+}
+
+/* Lenis */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.lenis {
+    scroll-behavior: auto;
+  }
+}
