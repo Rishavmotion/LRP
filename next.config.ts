@@ -6,8 +6,8 @@ const nextConfig: NextConfig = {
   output: "export",
   // Static export can't run the image optimizer; the only <Image> is the logo.
   images: { unoptimized: true },
-  cacheComponents: true,
-  partialPrefetching: true,
+  // Cache Components (PPR) needs a Node server and is incompatible with
+  // export mode; this page has no server data to cache anyway.
 };
 
 export default nextConfig;

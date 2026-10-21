@@ -68,6 +68,20 @@ headlines were set for Locator's widths and may need a glance afterwards.
 
 ## Deploy
 
-Static-friendly: no server data. `public/frames` (~25 MB, 852 files) ships with the app, so a
-CDN-backed host (Vercel, Netlify, Cloudflare) serves frames from the edge. Keep the source
-renders (`../LRP_renders`, `../klime png sequence`) out of git — see `../.gitignore`.
+The app is a static export (`output: "export"` in `next.config.ts`): `npm run build` writes
+plain HTML/JS/CSS plus the frames to `out/`. No Node server or Next adapter is needed.
+
+Hosted on **Cloudflare Pages** from the GitHub repo (`Rishavmotion/LRP`), so every push to
+`main` redeploys. Project settings:
+
+| setting          | value           |
+| ---------------- | --------------- |
+| Framework preset | Next.js (Static HTML Export) |
+| Build command    | `npm run build` |
+| Build output dir | `out`           |
+| Node version     | `22` (from `.node-version`) |
+
+To deploy from a laptop instead: `npx wrangler login`, then `npx wrangler pages deploy out`.
+
+`public/frames` (~25 MB, 852 files) is committed so the build needs no render access. Keep the
+source renders (`../LRP_renders`, `../klime png sequence`) out of git — see `../.gitignore`.
