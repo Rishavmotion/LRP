@@ -1,0 +1,13 @@
+# Cloudflare Workers static-asset headers (copied into out/ by the export).
+
+# Frame filenames aren't content-hashed, so cache for a week rather than forever:
+# a re-rendered sequence under the same names reaches visitors within 7 days.
+/frames/*
+  Cache-Control: public, max-age=604800, stale-while-revalidate=86400
+
+/brand/*
+  Cache-Control: public, max-age=604800, stale-while-revalidate=86400
+
+# Next's build output is content-hashed, so it can be cached indefinitely.
+/_next/static/*
+  Cache-Control: public, max-age=31536000, immutable
