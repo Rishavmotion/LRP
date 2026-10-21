@@ -11,7 +11,7 @@ import {
   sceneIndexAt,
   sourceFrameAt,
 } from "@/lib/scenes";
-import { FrameStore, loadManifest, type Manifest } from "@/lib/frameLoader";
+import { FrameStore, MANIFEST, type Manifest } from "@/lib/frameLoader";
 import { pickTier } from "@/lib/tier";
 import { sceneOverlay } from "./overlays/sceneOverlays";
 import { ScrollArrow } from "./Icons";
@@ -48,9 +48,8 @@ export default function Stage() {
     const ctx = canvas.getContext("2d", { alpha: false });
     if (!ctx) return;
 
-    let manifest: Manifest | null = null;
+    const manifest: Manifest = MANIFEST;
     let store: FrameStore | null = null;
-    let disposed = false;
     let lastDrawn = -1;
     let dpr = 1;
     let width = 0;
@@ -214,18 +213,10 @@ export default function Stage() {
     };
     window.addEventListener("keydown", onKey);
 
+    buildStore();
     resize();
-    loadManifest()
-      .then((m) => {
-        if (disposed) return;
-        manifest = m;
-        buildStore();
-        resize();
-      })
-      .catch((err) => console.error("Could not load frame manifest", err));
 
     return () => {
-      disposed = true;
       gsap.ticker.remove(tick);
       trigger.kill();
       window.removeEventListener("resize", onResize);

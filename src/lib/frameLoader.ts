@@ -7,6 +7,7 @@
 //   3. everything else.
 // `focus()` re-prioritises frames near the current scroll position.
 
+import manifestJson from "../../public/frames/manifest.json";
 import { frameUrl, type Tier } from "./tier";
 
 export type FrameSet = Tier;
@@ -18,11 +19,9 @@ export interface Manifest {
   sets: Record<FrameSet, { width: number; height: number; kind: "landscape" | "portrait" }>;
 }
 
-export async function loadManifest(): Promise<Manifest> {
-  const res = await fetch("/frames/manifest.json", { cache: "force-cache" });
-  if (!res.ok) throw new Error(`manifest: ${res.status}`);
-  return res.json();
-}
+// Bundled at build time rather than fetched: the JS filename is content-hashed,
+// so the manifest can never go stale behind the 7-day cache on /frames/*.
+export const MANIFEST = manifestJson as Manifest;
 
 function buildPriority(count: number, firstBand: number): number[] {
   const order: number[] = [];
