@@ -25,6 +25,32 @@
   --body: clamp(18px, 1.33vw, 24px);
   --eyebrow: clamp(14px, 1vw, 18px);
   --nav: 18px;
+
+  /* Height of the browser toolbar overlapping the page bottom (iOS Safari's
+     floating bar). The stage fills the large viewport; anything anchored to
+     the bottom sits this far up so it stays above the toolbar. */
+  --toolbar: 0px;
+  /* Room for the fixed nav above top-anchored overlays (mobile only). */
+  --top-safe: 0px;
+}
+
+@supports (height: 1lvh) {
+  :root {
+    --toolbar: calc(100lvh - 100svh);
+  }
+}
+
+/* Phone type scale: tuned for reading on a 390px screen rather than scaled
+   down from the desktop design. */
+@media (max-width: 767px) {
+  :root {
+    --h1: 38px;
+    --h2: 32px;
+    --lead: 16px;
+    --body: 16px;
+    --eyebrow: 13px;
+    --top-safe: 56px;
+  }
 }
 
 * {

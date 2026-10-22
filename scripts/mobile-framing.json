@@ -1,0 +1,27 @@
+{
+  "_comment": "Mobile (9:16) crop centre per source frame, as a fraction of the 2880px width. Linear between keyframes. The crop is 911px wide (31.6% of the frame), so centres are clamped to 0.158–0.842. Frames 101–135 are skipped by the scene map (empty sky + a skin whip), so the jump there is never seen.",
+  "keyframes": [
+    [0, 0.46],
+    [30, 0.44],
+    [50, 0.5],
+    [60, 0.55],
+    [90, 0.6],
+    [100, 0.62],
+    [136, 0.42],
+    [220, 0.42],
+    [235, 0.36],
+    [280, 0.33],
+    [300, 0.45],
+    [340, 0.42],
+    [360, 0.5],
+    [510, 0.5],
+    [520, 0.42],
+    [540, 0.48],
+    [560, 0.45],
+    [595, 0.47],
+    [620, 0.52],
+    [660, 0.45],
+    [700, 0.5],
+    [850, 0.5]
+  ]
+}

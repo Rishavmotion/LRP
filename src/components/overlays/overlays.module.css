@@ -104,6 +104,8 @@
     rgba(20, 51, 81, 0.88) 71.3%,
     rgba(33, 80, 126, 0.78) 100%
   );
+  /* Centre the content in the visible area, above any browser toolbar. */
+  padding-bottom: var(--toolbar);
 }
 
 .heroContent {
@@ -146,7 +148,7 @@
 
 .copy {
   position: absolute;
-  bottom: 0;
+  bottom: var(--toolbar);
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -193,11 +195,38 @@
     left: 0;
     right: 0;
     width: 100%;
-    padding: 20px;
+    gap: 10px;
+    padding: 20px 20px 28px;
+    /* A soft shadow keeps light text legible over bright skin and sky. */
+    text-shadow: 0 1px 14px rgba(0, 0, 0, 0.28);
+  }
+  .copy .h2 {
+    line-height: 1.02;
+    letter-spacing: -0.035em;
+  }
+  .copy .eyebrow {
+    padding: 0;
+    letter-spacing: 0;
+    font-weight: 400;
+    opacity: 0.85;
+    white-space: normal;
+  }
+  .copy .body {
+    padding: 0;
+    line-height: 1.4;
+    letter-spacing: -0.01em;
+    opacity: 0.92;
+    max-width: 34ch;
   }
   .gradientBottom,
   .gradientTop {
     display: block;
+    height: 260px;
+    opacity: 0.45;
+  }
+  /* Runs behind the browser toolbar too, so the fade reaches the very bottom. */
+  .gradientBottom {
+    height: calc(260px + var(--toolbar));
   }
 }
 
@@ -259,16 +288,24 @@
     bottom: auto;
     left: 0;
     top: 0;
-    padding: 20px;
+    padding: calc(20px + var(--top-safe)) 20px 20px;
+  }
+  .shades .eyebrow {
+    padding: 0;
+    font-size: 12px;
+    font-weight: 400;
+    letter-spacing: 0.04em;
+    opacity: 0.85;
   }
   .chips {
     width: 263px;
+    gap: 8px;
   }
   .chip {
     height: auto;
     gap: 6px;
-    padding: 6px;
-    font-size: 16px;
+    padding: 5px 10px 5px 5px;
+    font-size: 14px;
   }
   .swatch {
     width: 20px;
@@ -298,6 +335,13 @@
   .calloutText {
     font-size: 20px;
     line-height: 1.1;
+    text-shadow: 0 1px 12px rgba(0, 0, 0, 0.3);
+  }
+  /* Scale brackets and text together so the frame still fits its words
+     (20px text renders at ~16px). Top-left origin keeps the pieces aligned. */
+  .callout {
+    transform: translateY(var(--dy)) scale(0.8);
+    transform-origin: top left;
   }
 }
 
@@ -367,7 +411,7 @@
 
 @media (max-width: 767px) {
   .featureTag {
-    top: 70px;
+    top: calc(24px + var(--top-safe));
     right: auto;
     left: 27.76px;
     gap: 10px;
@@ -396,6 +440,7 @@
   background: rgba(255, 255, 255, 0.01);
   -webkit-backdrop-filter: blur(50px);
   backdrop-filter: blur(50px);
+  padding-bottom: var(--toolbar);
 }
 
 .uvContent {

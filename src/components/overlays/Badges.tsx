@@ -54,6 +54,13 @@ const BADGES: Badge[] = [
   },
 ];
 
+// Mobile positions come from the 852px-tall Paper frame, but Safari's visible
+// area is often 660–750px. Map them into the band between the nav and the
+// bottom of the visible viewport so every badge stays on screen.
+const DESIGN_HEIGHT = 852;
+const mobileTop = (t: number) =>
+  `calc(var(--top-safe) + (100svh - var(--top-safe)) * ${(t / DESIGN_HEIGHT).toFixed(4)})`;
+
 function Line({
   g,
 }: {
@@ -87,8 +94,8 @@ export default function Badges() {
             </div>
           </div>
           <div className={s.mobileOnly}>
-            <Line g={b.line.mobile} />
-            <div className={s.badge} style={b.mobile}>
+            <Line g={{ ...b.line.mobile, top: mobileTop(b.line.mobile.top) }} />
+            <div className={s.badge} style={{ left: b.mobile.left, top: mobileTop(b.mobile.top) }}>
               {b.label}
             </div>
           </div>

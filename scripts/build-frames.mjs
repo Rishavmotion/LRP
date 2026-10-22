@@ -22,7 +22,7 @@ import { fileURLToPath } from "node:url";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
 const SRC_DIR = path.resolve(ROOT, "..", "LRP_renders", "Frames");
-const VERSION = "v1";
+const VERSION = "v2";
 const FRAMES_DIR = path.resolve(ROOT, "public", "frames");
 const OUT_DIR = path.join(FRAMES_DIR, VERSION);
 const POSTER_DIR = path.resolve(ROOT, "public", "posters");
@@ -40,9 +40,25 @@ const SETS = {
   d1280: { width: 1280, height: 720, quality: 72, crop: null, kind: "landscape" },
   d1920: { width: 1920, height: 1080, quality: 70, crop: null, kind: "landscape" },
   d2560: { width: 2560, height: 1440, quality: 70, crop: null, kind: "landscape" },
-  // 9:16 centre crop for phones (the Figma mobile frames are the same crop).
+  // 9:16 crop for phones. The crop follows the subject shot by shot (see
+  // mobile-framing.json) instead of sitting dead centre.
   m810: { width: 810, height: 1440, quality: 70, crop: { w: 911, h: 1620 }, kind: "portrait" },
 };
+
+// Mobile crop centre per source frame (fraction of width), linear between keyframes.
+const FRAMING = JSON.parse(
+  await fs.readFile(path.join(__dirname, "mobile-framing.json"), "utf8")
+).keyframes;
+function focalX(frame) {
+  for (let i = 1; i < FRAMING.length; i++) {
+    const [b, x1] = FRAMING[i];
+    if (frame <= b) {
+      const [a, x0] = FRAMING[i - 1];
+      return x0 + ((x1 - x0) * (frame - a)) / (b - a);
+    }
+  }
+  return FRAMING[FRAMING.length - 1][1];
+}
 const POSTER_SET = "d1920";
 const POSTER_MOBILE_SET = "m810";
 // The hero opens on source frame 10 (src/lib/scenes.ts); the poster shows the same.
@@ -63,11 +79,12 @@ async function exists(p) {
   }
 }
 
-function pipeline(input, set) {
-  let img = sharp(input, { failOn: "none" });
+function pipeline(srcIndex, set) {
+  let img = sharp(srcPath(srcIndex), { failOn: "none" });
   if (set.crop) {
+    const left = Math.round(focalX(srcIndex) * SOURCE_W - set.crop.w / 2);
     img = img.extract({
-      left: Math.round((SOURCE_W - set.crop.w) / 2),
+      left: Math.max(0, Math.min(SOURCE_W - set.crop.w, left)),
       top: Math.round((SOURCE_H - set.crop.h) / 2),
       width: set.crop.w,
       height: set.crop.h,
@@ -77,11 +94,10 @@ function pipeline(input, set) {
 }
 
 async function buildFrame(outIndex, srcIndex) {
-  const input = srcPath(srcIndex);
   for (const [name, set] of Object.entries(SETS)) {
     const out = path.join(OUT_DIR, name, `${pad(outIndex)}.webp`);
     if (!FORCE && (await exists(out))) continue;
-    await pipeline(input, set)
+    await pipeline(srcIndex, set)
       .webp({ quality: set.quality, effort: 4, smartSubsample: true })
       .toFile(out);
   }
@@ -92,10 +108,10 @@ async function buildPoster() {
   const out = path.join(POSTER_DIR, "poster.jpg");
   const outMobile = path.join(POSTER_DIR, "poster-mobile.jpg");
   if (FORCE || !(await exists(out))) {
-    await pipeline(srcPath(POSTER_SOURCE_FRAME), SETS[POSTER_SET]).jpeg({ quality: 80, mozjpeg: true }).toFile(out);
+    await pipeline(POSTER_SOURCE_FRAME, SETS[POSTER_SET]).jpeg({ quality: 80, mozjpeg: true }).toFile(out);
   }
   if (FORCE || !(await exists(outMobile))) {
-    await pipeline(srcPath(POSTER_SOURCE_FRAME), SETS[POSTER_MOBILE_SET]).jpeg({ quality: 80, mozjpeg: true }).toFile(outMobile);
+    await pipeline(POSTER_SOURCE_FRAME, SETS[POSTER_MOBILE_SET]).jpeg({ quality: 80, mozjpeg: true }).toFile(outMobile);
   }
 }
 

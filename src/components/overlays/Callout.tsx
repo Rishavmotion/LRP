@@ -117,7 +117,7 @@ export const CALLOUT_FEATURE_LIGHT: CalloutProps = {
   },
   mobile: {
     left: "23px",
-    top: "23px",
+    top: "calc(23px + var(--top-safe))",
     w: 298,
     h: 295,
     blY: 115,
@@ -149,7 +149,7 @@ export const CALLOUT_INVISIBLE_FINISH: CalloutProps = {
   },
   mobile: {
     left: "23px",
-    top: "23px",
+    top: "calc(23px + var(--top-safe))",
     w: 298,
     h: 295,
     blY: 108,

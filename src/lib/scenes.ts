@@ -39,7 +39,10 @@ export const SCENES: Scene[] = [
   // early. This replaces the separate shadow section.
   { id: "hero", frames: [10, 55], scroll: 1.8, fadeIn: 0, fadeOut: 0.3 },
   { id: "freeze", frames: [55, 100], scroll: 1 },
-  { id: "tinted", frames: [100, 225], scroll: 1.6 },
+  // Source frames 101–135 are skipped: 104–116 are empty sky (the hand has
+  // left, the face hasn't arrived) and 128–132 a blurred skin whip. Scrubbed,
+  // they read as a blue then a brown flash, so the edit cuts hand → face.
+  { id: "tinted", frames: [136, 225], scroll: 1.6 },
   { id: "tinted-product", frames: [225, 300], scroll: 1.2 },
   { id: "applicator", frames: [300, 355], scroll: 1 },
   { id: "lightweight", frames: [355, 395], scroll: 1 },
