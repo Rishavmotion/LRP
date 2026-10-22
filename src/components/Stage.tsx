@@ -18,7 +18,7 @@ import s from "./Stage.module.css";
 const MAX_DPR = 2;
 /** Seconds for the scrub to catch up with the scroll position (a little inertia on top of Lenis). */
 const EASE = 0.08;
-/** Frames past the hero's scrub that load up front, so the first scroll never waits. */
+/** Frames past the opening scrub that load up front, so the first scroll never waits. */
 const HERO_LOOKAHEAD = 6;
 /**
  * If the exact frame isn't loaded, draw one at most this far away (±6 frames
@@ -75,9 +75,11 @@ export default function Stage() {
 
     const toIndex = (sourceFrame: number) =>
       Math.min(manifest.count - 1, Math.max(0, Math.round(sourceFrame / manifest.step)));
+    // Loaded before any scroll: the hero frame plus the shadow section's
+    // scrub, which is what the first scroll plays.
     const heroBand: [number, number] = [
       toIndex(SCENES[0].frames[0]),
-      toIndex(SCENES[0].frames[1]) + HERO_LOOKAHEAD,
+      toIndex(SCENES[1].frames[1]) + HERO_LOOKAHEAD,
     ];
     const heroEnd = SCENES[0].scroll / TOTAL_SCROLL;
 
@@ -205,7 +207,7 @@ export default function Stage() {
         if (el.dataset.visible !== String(visible)) el.dataset.visible = String(visible);
       }
 
-      // Design v2: the cue belongs to the hero only, and leaves with its copy.
+      // The cue belongs to the hero (on every device) and leaves with its gradient.
       if (cueRef.current) cueRef.current.style.opacity = overlayState(0, scrollVh).opacity.toFixed(3);
 
       if (hud && hud.dataset.on === "1") {

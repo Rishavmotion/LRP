@@ -6,6 +6,7 @@
 
 export type SceneId =
   | "hero"
+  | "shadow"
   | "freeze"
   | "tinted"
   | "tinted-product"
@@ -30,14 +31,20 @@ export interface Scene {
   fadeIn?: number;
   /** Fraction of the section over which its copy fades out (default 0.18). */
   fadeOut?: number;
+  /**
+   * Keep this overlay fully visible through its own section, then fade it
+   * out across this fraction of the NEXT section. The hero uses it so its
+   * gradient dissolves only as the shadow hand rises — never onto bare sky.
+   */
+  linger?: number;
 }
 
 export const SCENES: Scene[] = [
-  // Design v2: the hero opens on frame 10, where only the tips of the shadow
-  // hand show (~91% down), and it rises as you scroll. The gradient stays
-  // fully dark until 70% of the way through so the bright sky isn't revealed
-  // early. This replaces the separate shadow section.
-  { id: "hero", frames: [10, 55], scroll: 1.8, fadeIn: 0, fadeOut: 0.3 },
+  // The hero holds still on frame 0 under its opaque gradient (no scrubbing
+  // behind the copy). Its gradient then dissolves over the first part of the
+  // shadow section, while the shadow hand rises into frame.
+  { id: "hero", frames: [0, 0], scroll: 1, fadeIn: 0, fadeOut: 0, linger: 0.4 },
+  { id: "shadow", frames: [0, 55], scroll: 1.2 },
   { id: "freeze", frames: [55, 100], scroll: 1 },
   // Source frames 101–135 are skipped: 104–116 are empty sky (the hand has
   // left, the face hasn't arrived) and 128–132 a blurred skin whip. Scrubbed,
@@ -92,6 +99,14 @@ export function sourceFrameAt(scrollVh: number): number {
 export function overlayState(i: number, scrollVh: number): { opacity: number; reveal: number } {
   const scene = SCENES[i];
   const local = localProgress(i, scrollVh);
+
+  if (scene.linger !== undefined) {
+    if (local < 0) return { opacity: 0, reveal: 0 };
+    if (local <= 1) return { opacity: 1, reveal: 1 };
+    if (!SCENES[i + 1]) return { opacity: 0, reveal: 1 };
+    const t = clamp01(localProgress(i + 1, scrollVh) / scene.linger);
+    return { opacity: 1 - smooth(t), reveal: 1 };
+  }
 
   if (local < 0 || local > 1) return { opacity: 0, reveal: local < 0 ? 0 : 1 };
   const fadeIn = scene.fadeIn ?? DEFAULT_FADE;

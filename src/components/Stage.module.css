@@ -78,7 +78,8 @@
 
 @media (max-width: 767px) {
   .cue {
-    display: none;
+    font-size: 14px;
+    bottom: calc(28px + var(--toolbar));
   }
 }
 

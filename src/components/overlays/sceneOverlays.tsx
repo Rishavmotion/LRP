@@ -138,6 +138,7 @@ export function sceneOverlay(id: SceneId): ReactNode {
       return <UvCta />;
 
     // Footage-only sections.
+    case "shadow":
     case "tinted":
     case "applicator":
     case "court":
