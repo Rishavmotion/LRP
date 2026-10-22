@@ -1,13 +1,15 @@
 # Cloudflare Workers static-asset headers (copied into out/ by the export).
 
-# Frame filenames aren't content-hashed, so cache for a week rather than forever:
-# a re-rendered sequence under the same names reaches visitors within 7 days.
+# Frames live under a version folder (/frames/v1/…), so they never change at a
+# given URL: cache for a year. A re-render must bump VERSION in
+# scripts/build-frames.mjs.
 /frames/*
-  Cache-Control: public, max-age=604800, stale-while-revalidate=86400
+  Cache-Control: public, max-age=31536000, immutable
 
-/brand/*
-  Cache-Control: public, max-age=604800, stale-while-revalidate=86400
-
-# Next's build output is content-hashed, so it can be cached indefinitely.
+# Next's build output (JS, CSS, the logo) is content-hashed.
 /_next/static/*
   Cache-Control: public, max-age=31536000, immutable
+
+# Posters aren't versioned: a week, refreshed in the background.
+/posters/*
+  Cache-Control: public, max-age=604800, stale-while-revalidate=86400

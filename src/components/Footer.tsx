@@ -1,4 +1,5 @@
 import Image from "next/image";
+import logo from "@/assets/logo.webp";
 import { ArrowUpRight } from "./Icons";
 import s from "./Footer.module.css";
 
@@ -26,7 +27,7 @@ export default function Footer() {
       <div className={s.inner}>
         <div className={s.top}>
           <div className={s.brand}>
-            <Image src="/brand/logo.png" alt="La Roche-Posay" width={237} height={61} />
+            <Image src={logo} alt="La Roche-Posay" />
             <p className={s.tagline}>Dermatological skincare for a better life.</p>
           </div>
 

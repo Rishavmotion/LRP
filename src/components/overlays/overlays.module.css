@@ -93,14 +93,16 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  /* Radial gradient from Figma (2816×798px ellipse on the 1801×1070 frame). */
+  /* Radial gradient from Figma (2816×798px ellipse on the 1801×1070 frame).
+     Design v2: the lower half lets the footage through so the shadow hand
+     (frame 18) reads beneath it, as in Paper. */
   background: radial-gradient(
     156vw 74.6vh at 50% 25.6%,
     #061624 0%,
     #061624 42.5%,
-    #0d253b 56.9%,
-    #143351 71.3%,
-    #21507e 100%
+    rgba(13, 37, 59, 0.96) 56.9%,
+    rgba(20, 51, 81, 0.88) 71.3%,
+    rgba(33, 80, 126, 0.78) 100%
   );
 }
 
@@ -318,14 +320,6 @@
   transform: translateY(var(--dy));
 }
 
-.badgeIcon {
-  width: 31px;
-  height: 31px;
-  flex-shrink: 0;
-  background: #fff;
-  opacity: 0.4;
-}
-
 .badgeLine {
   position: absolute;
   transform: translateY(var(--dy));
@@ -333,13 +327,8 @@
 
 @media (max-width: 767px) {
   .badge {
-    gap: 8px;
     padding: 8px;
     font-size: 16px;
-  }
-  .badgeIcon {
-    width: 24px;
-    height: 24px;
   }
 }
 

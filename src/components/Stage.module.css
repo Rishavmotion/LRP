@@ -8,12 +8,12 @@
   height: 100vh;
   height: 100svh;
   overflow: hidden;
-  background: var(--navy-900) url("/frames/poster.jpg") center / cover no-repeat;
+  background: var(--navy-900) url("/posters/poster.jpg") center / cover no-repeat;
 }
 
 @media (max-width: 767px) {
   .sticky {
-    background-image: url("/frames/poster-mobile.jpg");
+    background-image: url("/posters/poster-mobile.jpg");
   }
 }
 

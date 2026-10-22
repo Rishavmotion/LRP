@@ -1,7 +1,11 @@
 // Build the scroll-sequence frames from the LRP render.
 //
 // Source: ../LRP_renders/Frames/frame_00000.jpg … frame_00850.jpg (2880×1620, 50fps)
-// Output: public/frames/<set>/<index>.webp + poster.jpg + manifest.json
+// Output: public/frames/<VERSION>/<set>/<index>.webp, public/frames/manifest.json,
+//         public/posters/poster*.jpg
+//
+// Frames are served with a 1-year immutable cache (public/_headers), so a
+// re-render MUST bump VERSION — otherwise returning visitors keep old frames.
 //
 // Usage:  node scripts/build-frames.mjs            (skips frames already built)
 //         node scripts/build-frames.mjs --force    (rebuilds everything)
@@ -18,7 +22,10 @@ import { fileURLToPath } from "node:url";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
 const SRC_DIR = path.resolve(ROOT, "..", "LRP_renders", "Frames");
-const OUT_DIR = path.resolve(ROOT, "public", "frames");
+const VERSION = "v1";
+const FRAMES_DIR = path.resolve(ROOT, "public", "frames");
+const OUT_DIR = path.join(FRAMES_DIR, VERSION);
+const POSTER_DIR = path.resolve(ROOT, "public", "posters");
 
 const SOURCE_COUNT = 851; // frame_00000 … frame_00850
 const SOURCE_W = 2880;
@@ -38,6 +45,8 @@ const SETS = {
 };
 const POSTER_SET = "d1920";
 const POSTER_MOBILE_SET = "m810";
+// The hero opens on source frame 18 (src/lib/scenes.ts); the poster shows the same.
+const POSTER_SOURCE_FRAME = 18;
 
 const FORCE = process.argv.includes("--force");
 const WORKERS = Math.max(2, Math.floor(os.cpus().length / 2));
@@ -79,13 +88,14 @@ async function buildFrame(outIndex, srcIndex) {
 }
 
 async function buildPoster() {
-  const out = path.join(OUT_DIR, "poster.jpg");
-  const outMobile = path.join(OUT_DIR, "poster-mobile.jpg");
+  await fs.mkdir(POSTER_DIR, { recursive: true });
+  const out = path.join(POSTER_DIR, "poster.jpg");
+  const outMobile = path.join(POSTER_DIR, "poster-mobile.jpg");
   if (FORCE || !(await exists(out))) {
-    await pipeline(srcPath(0), SETS[POSTER_SET]).jpeg({ quality: 80, mozjpeg: true }).toFile(out);
+    await pipeline(srcPath(POSTER_SOURCE_FRAME), SETS[POSTER_SET]).jpeg({ quality: 80, mozjpeg: true }).toFile(out);
   }
   if (FORCE || !(await exists(outMobile))) {
-    await pipeline(srcPath(0), SETS[POSTER_MOBILE_SET]).jpeg({ quality: 80, mozjpeg: true }).toFile(outMobile);
+    await pipeline(srcPath(POSTER_SOURCE_FRAME), SETS[POSTER_MOBILE_SET]).jpeg({ quality: 80, mozjpeg: true }).toFile(outMobile);
   }
 }
 
@@ -126,6 +136,7 @@ async function main() {
   await buildPoster();
 
   const manifest = {
+    version: VERSION,
     step: STEP,
     count,
     sourceCount: SOURCE_COUNT,
@@ -134,7 +145,7 @@ async function main() {
       Object.entries(SETS).map(([name, s]) => [name, { width: s.width, height: s.height, kind: s.kind }])
     ),
   };
-  await fs.writeFile(path.join(OUT_DIR, "manifest.json"), JSON.stringify(manifest, null, 2));
+  await fs.writeFile(path.join(FRAMES_DIR, "manifest.json"), JSON.stringify(manifest, null, 2));
 
   for (const name of Object.keys(SETS)) {
     const { files, mb } = await dirSize(path.join(OUT_DIR, name));

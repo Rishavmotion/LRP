@@ -8,6 +8,9 @@
 //   1600–2199  d1920                 d2560
 //   ≥2200      d2560                 d2560
 
+import MANIFEST_JSON from "../../public/frames/manifest.json";
+import { SCENES } from "./scenes";
+
 export type Tier = "m810" | "d1280" | "d1920" | "d2560";
 
 export const TIER_QUERIES: Record<Tier, string> = {
@@ -21,11 +24,12 @@ export const TIER_QUERIES: Record<Tier, string> = {
 
 const DOWNGRADE: Record<Tier, Tier> = { m810: "m810", d1280: "d1280", d1920: "d1280", d2560: "d1920" };
 
-/** Frames preloaded from the HTML head so the opening scenes are in flight before JS boots. */
-export const PRELOAD_FRAMES = 6;
+/** Decimated index of the hero's opening frame — the only frame visible before scrolling. */
+export const HERO_FRAME = Math.round(SCENES[0].frames[0] / MANIFEST_JSON.step);
 
+// Frames live under a version folder so they can be cached as immutable.
 export const frameUrl = (set: string, index: number) =>
-  `/frames/${set}/${String(index).padStart(4, "0")}.webp`;
+  `/frames/${MANIFEST_JSON.version}/${set}/${String(index).padStart(4, "0")}.webp`;
 
 export function pickTier(): Tier {
   let tier: Tier = "d1920";

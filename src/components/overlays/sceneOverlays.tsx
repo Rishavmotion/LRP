@@ -40,14 +40,8 @@ export function sceneOverlay(id: SceneId): ReactNode {
         />
       );
 
-    case "tinted":
-      return (
-        <>
-          {TINTED}
-          <Shades />
-        </>
-      );
-
+    // Design v2: the tinted copy and shades appear once the product arrives,
+    // not on the face push-in before it.
     case "tinted-product":
       return (
         <>
@@ -144,7 +138,7 @@ export function sceneOverlay(id: SceneId): ReactNode {
       return <UvCta />;
 
     // Footage-only sections.
-    case "shadow":
+    case "tinted":
     case "applicator":
     case "court":
     default:

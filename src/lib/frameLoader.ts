@@ -1,11 +1,13 @@
 // Progressive frame loader for the scroll sequence.
 //
 // Frames are decoded into <img> elements so the browser manages decoded-image
-// memory (426 frames as raw ImageBitmaps would be several GB). Load order:
-//   1. the first `firstBand` frames in order (hero → first scenes),
-//   2. a coarse pass over the whole range (every 32nd, 16th, 8th …),
-//   3. everything else.
-// `focus()` re-prioritises frames near the current scroll position.
+// memory (426 frames as raw ImageBitmaps would be several GB). Two phases:
+//   1. on load: the `band` frames in order (the hero's scrub) plus every 32nd
+//      frame of the whole story, so a fast scroll always has a nearby frame;
+//   2. after `unlock()` (the visitor starts scrolling): the rest, coarse to
+//      fine (every 16th, 8th … 1st).
+// A visitor who never scrolls downloads ~45 frames, not 426. `focus()`
+// re-prioritises frames near the current scroll position.
 
 import manifestJson from "../../public/frames/manifest.json";
 import { frameUrl, type Tier } from "./tier";
@@ -13,6 +15,7 @@ import { frameUrl, type Tier } from "./tier";
 export type FrameSet = Tier;
 
 export interface Manifest {
+  version: string;
   step: number;
   count: number;
   sourceCount: number;
@@ -20,23 +23,25 @@ export interface Manifest {
 }
 
 // Bundled at build time rather than fetched: the JS filename is content-hashed,
-// so the manifest can never go stale behind the 7-day cache on /frames/*.
+// so the manifest can never go stale behind the long cache on /frames/*.
 export const MANIFEST = manifestJson as Manifest;
 
-function buildPriority(count: number, firstBand: number): number[] {
-  const order: number[] = [];
+function buildPhases(count: number, band: [number, number]): { now: number[]; later: number[] } {
   const seen = new Set<number>();
-  const push = (i: number) => {
+  const take = (out: number[], i: number) => {
     if (i >= 0 && i < count && !seen.has(i)) {
       seen.add(i);
-      order.push(i);
+      out.push(i);
     }
   };
-  for (let i = 0; i < firstBand; i++) push(i);
-  for (const stride of [32, 16, 8, 4, 2, 1]) {
-    for (let i = 0; i < count; i += stride) push(i);
+  const now: number[] = [];
+  for (let i = band[0]; i <= band[1]; i++) take(now, i);
+  for (let i = 0; i < count; i += 32) take(now, i);
+  const later: number[] = [];
+  for (const stride of [16, 8, 4, 2, 1]) {
+    for (let i = 0; i < count; i += stride) take(later, i);
   }
-  return order;
+  return { now, later };
 }
 
 export class FrameStore {
@@ -45,7 +50,11 @@ export class FrameStore {
   onProgress?: (loaded: number, total: number) => void;
   onFrame?: (index: number) => void;
 
+  unlocked = false;
+  /** Size of phase 1 — what loads before the visitor scrolls. */
+  readonly initialCount: number;
   private pending: number[];
+  private deferred: number[];
   private inflight = 0;
   private destroyed = false;
   private readonly concurrency: number;
@@ -53,14 +62,26 @@ export class FrameStore {
   constructor(
     readonly set: FrameSet,
     readonly count: number,
-    options: { firstBand?: number; concurrency?: number } = {}
+    options: { band: [number, number]; concurrency?: number }
   ) {
     this.frames = new Array(count).fill(null);
-    this.pending = buildPriority(count, options.firstBand ?? 60);
+    const { now, later } = buildPhases(count, options.band);
+    this.pending = now;
+    this.deferred = later;
+    this.initialCount = now.length;
     this.concurrency = options.concurrency ?? 6;
   }
 
   start() {
+    this.pump();
+  }
+
+  /** Queue the rest of the sequence. Idempotent. */
+  unlock() {
+    if (this.unlocked) return;
+    this.unlocked = true;
+    this.pending = this.pending.concat(this.deferred);
+    this.deferred = [];
     this.pump();
   }
 
@@ -84,9 +105,9 @@ export class FrameStore {
     return -1;
   }
 
-  /** True once every frame in [0, upTo) is decoded. */
-  ready(upTo: number): boolean {
-    for (let i = 0; i < Math.min(upTo, this.count); i++) if (!this.frames[i]) return false;
+  /** True once every frame in [from, to] is decoded. */
+  ready(from: number, to: number): boolean {
+    for (let i = Math.max(0, from); i <= Math.min(to, this.count - 1); i++) if (!this.frames[i]) return false;
     return true;
   }
 

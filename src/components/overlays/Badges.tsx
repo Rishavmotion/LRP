@@ -83,15 +83,13 @@ export default function Badges() {
           <div className={s.desktopOnly}>
             <Line g={b.line.desktop} />
             <div className={s.badge} style={b.desktop}>
-              <span className={s.badgeIcon} />
-              <span>{b.label}</span>
+              {b.label}
             </div>
           </div>
           <div className={s.mobileOnly}>
             <Line g={b.line.mobile} />
             <div className={s.badge} style={b.mobile}>
-              <span className={s.badgeIcon} />
-              <span>{b.label}</span>
+              {b.label}
             </div>
           </div>
         </div>

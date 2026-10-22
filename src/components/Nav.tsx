@@ -1,4 +1,5 @@
 import Image from "next/image";
+import logo from "@/assets/logo.webp";
 import { Hamburger } from "./Icons";
 import s from "./Nav.module.css";
 
@@ -13,7 +14,7 @@ export default function Nav() {
       </button>
 
       <a href="#" className={s.logo} aria-label="La Roche-Posay">
-        <Image src="/brand/logo.png" alt="" width={237} height={61} priority />
+        <Image src={logo} alt="" priority />
       </a>
 
       <nav className={s.links} aria-label="Primary">

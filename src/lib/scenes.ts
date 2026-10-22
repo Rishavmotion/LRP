@@ -6,7 +6,6 @@
 
 export type SceneId =
   | "hero"
-  | "shadow"
   | "freeze"
   | "tinted"
   | "tinted-product"
@@ -31,17 +30,13 @@ export interface Scene {
   fadeIn?: number;
   /** Fraction of the section over which its copy fades out (default 0.18). */
   fadeOut?: number;
-  /**
-   * Keep this overlay fully visible through its own section, then fade it
-   * out across this fraction of the NEXT section. Used by the hero so the
-   * dark gradient dissolves into the sky as the shadow hand rises.
-   */
-  linger?: number;
 }
 
 export const SCENES: Scene[] = [
-  { id: "hero", frames: [0, 0], scroll: 1, fadeIn: 0, fadeOut: 0, linger: 0.35 },
-  { id: "shadow", frames: [0, 55], scroll: 1.2 },
+  // Design v2: the hero opens on frame 18, where the shadow hand's top edge sits
+  // ~77% down (as placed in Paper), and the copy fades as it rises. This
+  // replaces the separate shadow section.
+  { id: "hero", frames: [18, 55], scroll: 1.8, fadeIn: 0, fadeOut: 0.55 },
   { id: "freeze", frames: [55, 100], scroll: 1 },
   { id: "tinted", frames: [100, 225], scroll: 1.6 },
   { id: "tinted-product", frames: [225, 300], scroll: 1.2 },
@@ -93,16 +88,6 @@ export function sourceFrameAt(scrollVh: number): number {
 export function overlayState(i: number, scrollVh: number): { opacity: number; reveal: number } {
   const scene = SCENES[i];
   const local = localProgress(i, scrollVh);
-
-  if (scene.linger !== undefined) {
-    if (local < 0) return { opacity: 0, reveal: 0 };
-    if (local <= 1) return { opacity: 1, reveal: 1 };
-    const next = SCENES[i + 1];
-    if (!next) return { opacity: 0, reveal: 1 };
-    const nextLocal = localProgress(i + 1, scrollVh);
-    const t = clamp01(nextLocal / scene.linger);
-    return { opacity: 1 - smooth(t), reveal: 1 };
-  }
 
   if (local < 0 || local > 1) return { opacity: 0, reveal: local < 0 ? 0 : 1 };
   const fadeIn = scene.fadeIn ?? DEFAULT_FADE;
