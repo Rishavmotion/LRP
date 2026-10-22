@@ -95,10 +95,14 @@ export class FrameStore {
     this.pending = near.concat(rest);
   }
 
-  /** Index of the nearest loaded frame to `i`, or -1 if nothing is loaded yet. */
-  nearest(i: number): number {
+  /**
+   * Index of the nearest loaded frame within `maxDistance` of `i`, or -1.
+   * The limit stops a fast scroll from flashing an unrelated shot (e.g. the
+   * plain-sky frame 0); the caller keeps showing its current image instead.
+   */
+  nearest(i: number, maxDistance = this.count): number {
     if (this.frames[i]) return i;
-    for (let d = 1; d < this.count; d++) {
+    for (let d = 1; d <= maxDistance; d++) {
       if (i - d >= 0 && this.frames[i - d]) return i - d;
       if (i + d < this.count && this.frames[i + d]) return i + d;
     }

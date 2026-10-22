@@ -45,8 +45,8 @@ const SETS = {
 };
 const POSTER_SET = "d1920";
 const POSTER_MOBILE_SET = "m810";
-// The hero opens on source frame 18 (src/lib/scenes.ts); the poster shows the same.
-const POSTER_SOURCE_FRAME = 18;
+// The hero opens on source frame 10 (src/lib/scenes.ts); the poster shows the same.
+const POSTER_SOURCE_FRAME = 10;
 
 const FORCE = process.argv.includes("--force");
 const WORKERS = Math.max(2, Math.floor(os.cpus().length / 2));

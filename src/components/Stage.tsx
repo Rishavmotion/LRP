@@ -20,6 +20,11 @@ const MAX_DPR = 2;
 const EASE = 0.08;
 /** Frames past the hero's scrub that load up front, so the first scroll never waits. */
 const HERO_LOOKAHEAD = 6;
+/**
+ * If the exact frame isn't loaded, draw one at most this far away (±6 frames
+ * ≈ 0.24 s of footage); otherwise keep the current image until it arrives.
+ */
+const FALLBACK_DISTANCE = 6;
 
 const clamp01 = (v: number) => Math.min(1, Math.max(0, v));
 
@@ -134,7 +139,7 @@ export default function Stage() {
 
     const draw = (index: number) => {
       if (!store || !width) return;
-      const i = store.nearest(index);
+      const i = store.nearest(index, FALLBACK_DISTANCE);
       if (i < 0 || i === lastDrawn) return;
       const img = store.frames[i];
       if (!img) return;

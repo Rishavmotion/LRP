@@ -53,6 +53,27 @@
   z-index: 3;
 }
 
+/* Arrow nudges down 6px and back: 0.5s each way, looping. */
+.cue svg {
+  animation: cue-bob 1s ease-in-out infinite;
+}
+
+@keyframes cue-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(6px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cue svg {
+    animation: none;
+  }
+}
+
 @media (max-width: 767px) {
   .cue {
     display: none;

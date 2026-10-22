@@ -33,10 +33,11 @@ export interface Scene {
 }
 
 export const SCENES: Scene[] = [
-  // Design v2: the hero opens on frame 18, where the shadow hand's top edge sits
-  // ~77% down (as placed in Paper), and the copy fades as it rises. This
-  // replaces the separate shadow section.
-  { id: "hero", frames: [18, 55], scroll: 1.8, fadeIn: 0, fadeOut: 0.55 },
+  // Design v2: the hero opens on frame 10, where only the tips of the shadow
+  // hand show (~91% down), and it rises as you scroll. The gradient stays
+  // fully dark until 70% of the way through so the bright sky isn't revealed
+  // early. This replaces the separate shadow section.
+  { id: "hero", frames: [10, 55], scroll: 1.8, fadeIn: 0, fadeOut: 0.3 },
   { id: "freeze", frames: [55, 100], scroll: 1 },
   { id: "tinted", frames: [100, 225], scroll: 1.6 },
   { id: "tinted-product", frames: [225, 300], scroll: 1.2 },
