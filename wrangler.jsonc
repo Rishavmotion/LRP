@@ -1,10 +1,11 @@
 // Cloudflare Workers config: an assets-only Worker that serves the static
 // export in ./out (no Worker script). Cloudflare's Git build runs
 // `npm run build` then `npx wrangler deploy`.
-// `name` must match the Worker's name in the Cloudflare dashboard.
+// `name` must match the Worker's name in the Cloudflare dashboard. On the
+// `v2` branch this is a separate Worker (lrp-v2), so the two sites never collide.
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "lrp",
+  "name": "lrp-v2",
   "compatibility_date": "2026-10-21",
   "assets": {
     "directory": "./out",
